@@ -8,5 +8,5 @@ In addtion to the inlcuded files you will need some libraries installed into Ard
 ESP32S3 support in order to flash to the board, this should have been setup if you followed the guide links above
 Adafruit-GXF for the drawinngs and font
 PCF85063A-Soldered for the RTC
-Weather API and JSON parsing is etup for https://www.weatherapi.com/ you will need to setup a free account and copy your API
+Weather API and JSON parsing is Setup for https://www.weatherapi.com/ you will need to setup a free account and copy your API
 Update the Secrets.h file for your WIFI, Weather API and city location. 
