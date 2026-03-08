@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>RLCD Weather Dashboard — All Pages Preview</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#2a2a2a;font-family:monospace;display:flex;flex-direction:column;align-items:center;gap:0;padding:24px 16px;}
+  h1{color:#bbb;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;}
+  .pw{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:24px;}
+  .pl{color:#888;font-size:10px;letter-spacing:2px;text-transform:uppercase;}
+  canvas{display:block;border:2px solid #555;background:#fff;image-rendering:pixelated;image-rendering:crisp-edges;}
+</style>
+</head>
+<body>
+<h1>RLCD Weather Dashboard &mdash; All 12 Pages</h1>
+<div class="pw"><div class="pl">Page 0 — Dashboard</div><canvas id="c0" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 1 — Current Conditions</div><canvas id="c1" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 2 — Hourly Forecast</div><canvas id="c2" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 3 — 3-Day Forecast</div><canvas id="c3" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 4 — Astronomy</div><canvas id="c4" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 5 — Lunar Orbit</div><canvas id="c5" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 6 — Sun Arc</div><canvas id="c6" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 7 — Seasons Classic</div><canvas id="c7" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 8 — Seasons Orbit</div><canvas id="c8" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 9 — Temp Graph</div><canvas id="c9" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 10 — Humidity Graph</div><canvas id="c10" width="400" height="300"></canvas></div>
+<div class="pw"><div class="pl">Page 11 — System Info</div><canvas id="c11" width="400" height="300"></canvas></div>
+<script>
+const FONTS = {"small":{"name":"FreeSans9pt7b","yAdvance":22,"bitmaps":[255,255,248,192,222,247,32,9,134,65,145,255,19,4,195,32,200,255,137,130,97,144,16,31,20,218,61,30,131,64,120,23,8,244,122,53,51,240,64,32,56,16,236,32,198,32,198,64,198,64,108,128,57,0,1,60,2,119,2,99,4,99,4,119,8,60,14,6,96,204,25,129,224,24,15,3,54,194,216,115,6,49,227,196,254,19,38,108,204,204,196,102,35,16,140,70,99,51,51,50,102,76,128,37,126,165,0,48,195,63,48,195,12,214,240,192,8,68,33,16,132,66,17,8,0,60,102,66,195,195,195,195,195,195,195,66,102,60,17,63,51,51,51,51,48,62,49,176,120,48,24,28,28,28,24,24,16,8,7,248,60,102,195,195,3,6,28,7,3,195,195,102,60,12,24,113,98,201,163,70,254,24,48,96,192,127,32,16,8,8,7,243,140,3,1,128,240,108,99,224,30,49,152,120,12,6,243,141,131,193,224,208,108,99,224,255,3,2,6,4,12,8,24,24,24,16,48,48,62,49,176,120,60,27,24,248,198,193,224,240,108,99,224,60,102,194,195,195,195,103,59,3,3,194,102,60,192,0,48,192,0,0,100,160,0,129,199,142,12,7,128,112,14,1,128,255,128,0,31,240,0,112,14,1,192,24,56,113,192,128,0,62,49,176,120,48,24,24,56,24,24,12,0,0,1,128,3,240,6,14,6,1,134,0,102,29,187,49,207,24,199,152,99,204,49,230,17,179,153,204,247,134,0,1,128,0,112,64,15,224,6,0,240,15,0,144,25,129,152,16,131,12,63,194,4,96,102,6,192,48,255,24,51,3,96,108,13,131,63,198,6,192,120,15,1,224,111,248,31,134,25,129,160,60,1,128,48,6,0,192,104,13,131,24,97,240,255,24,51,3,96,60,7,128,240,30,3,192,120,15,3,96,207,240,255,224,48,24,12,6,3,253,128,192,96,48,24,15,248,255,192,192,192,192,192,254,192,192,192,192,192,192,15,131,14,96,102,3,192,12,0,193,252,3,192,54,3,96,115,15,15,16,192,120,15,1,224,60,7,128,255,254,3,192,120,15,1,224,60,6,255,255,255,192,6,12,24,48,96,193,131,7,143,30,39,128,192,216,51,12,99,12,193,184,63,7,48,195,24,99,6,96,108,12,192,192,192,192,192,192,192,192,192,192,192,192,255,224,63,1,252,31,224,253,5,236,111,99,121,19,205,158,108,241,71,142,60,113,128,224,124,15,193,232,61,135,152,241,30,51,195,120,111,7,224,124,14,15,129,131,24,12,192,108,1,224,15,0,120,3,192,27,1,152,12,96,192,248,0,255,48,108,15,3,192,240,111,243,0,192,48,12,3,0,192,0,15,129,131,24,12,192,108,1,224,15,0,120,3,192,27,1,152,108,96,192,251,0,8,255,140,14,192,108,6,192,108,12,255,140,14,192,108,6,192,108,6,192,112,63,24,108,15,3,192,30,1,240,14,0,240,60,13,134,63,0,255,134,3,1,128,192,96,48,24,12,6,3,1,128,192,192,120,15,1,224,60,7,128,240,30,3,192,120,15,1,176,97,240,192,108,13,129,16,99,12,97,4,96,204,25,1,96,60,7,0,96,193,129,48,225,152,112,204,40,102,38,33,19,48,200,152,108,76,20,52,10,26,7,7,3,3,128,129,128,96,99,12,48,193,152,15,0,224,6,0,240,25,1,152,48,198,14,96,96,192,54,6,48,195,12,25,129,216,15,0,96,6,0,96,6,0,96,6,0,255,192,96,48,12,6,3,1,192,96,48,24,6,3,0,255,192,251,109,182,219,109,182,224,132,16,132,16,132,16,132,16,128,237,182,219,109,182,219,224,48,96,162,68,216,161,128,255,192,198,48,126,113,176,192,96,243,219,13,134,199,61,192,192,96,48,27,206,54,15,7,131,193,224,240,124,109,224,60,102,195,192,192,192,192,195,102,60,3,3,3,59,103,195,195,195,195,195,195,103,59,60,102,195,195,255,192,192,195,102,60,54,111,102,102,102,102,96,59,103,195,195,195,195,195,195,103,59,3,3,198,124,192,192,192,222,227,195,195,195,195,195,195,195,195,195,255,255,192,48,3,51,51,51,51,51,51,224,192,96,48,24,76,70,99,97,240,236,98,49,152,108,48,255,255,255,192,222,247,28,240,199,134,60,49,225,143,12,120,99,195,30,24,192,222,227,195,195,195,195,195,195,195,195,60,102,195,195,195,195,195,195,102,60,222,113,176,120,60,30,15,7,131,227,111,48,24,12,0,59,103,195,195,195,195,195,195,103,59,3,3,3,223,49,140,99,24,198,0,62,227,192,192,224,60,7,195,227,126,102,246,102,102,102,103,195,195,195,195,195,195,195,195,199,123,193,160,152,204,66,33,176,208,40,28,12,0,198,30,56,145,196,202,102,211,22,208,166,135,28,56,192,198,0,67,98,54,28,24,28,60,38,98,67,193,33,152,204,66,97,176,208,56,28,12,6,3,1,3,0,254,12,48,193,134,24,32,193,252,54,102,102,110,206,102,102,102,48,255,255,255,255,192,198,102,102,103,55,102,102,102,192,97,36,56],"glyphs":[{"offset":0,"w":0,"h":0,"xAdv":5,"xOff":0,"yOff":1},{"offset":0,"w":2,"h":13,"xAdv":6,"xOff":2,"yOff":-12},{"offset":4,"w":5,"h":4,"xAdv":6,"xOff":1,"yOff":-12},{"offset":7,"w":10,"h":12,"xAdv":10,"xOff":0,"yOff":-11},{"offset":22,"w":9,"h":16,"xAdv":10,"xOff":1,"yOff":-13},{"offset":40,"w":16,"h":13,"xAdv":16,"xOff":1,"yOff":-12},{"offset":66,"w":11,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":84,"w":2,"h":4,"xAdv":4,"xOff":1,"yOff":-12},{"offset":85,"w":4,"h":17,"xAdv":6,"xOff":1,"yOff":-12},{"offset":94,"w":4,"h":17,"xAdv":6,"xOff":1,"yOff":-12},{"offset":103,"w":5,"h":5,"xAdv":7,"xOff":1,"yOff":-12},{"offset":107,"w":6,"h":8,"xAdv":11,"xOff":3,"yOff":-7},{"offset":113,"w":2,"h":4,"xAdv":5,"xOff":2,"yOff":0},{"offset":114,"w":4,"h":1,"xAdv":6,"xOff":1,"yOff":-4},{"offset":115,"w":2,"h":1,"xAdv":5,"xOff":1,"yOff":0},{"offset":116,"w":5,"h":13,"xAdv":5,"xOff":0,"yOff":-12},{"offset":125,"w":8,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":138,"w":4,"h":13,"xAdv":10,"xOff":3,"yOff":-12},{"offset":145,"w":9,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":160,"w":8,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":173,"w":7,"h":13,"xAdv":10,"xOff":2,"yOff":-12},{"offset":185,"w":9,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":200,"w":9,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":215,"w":8,"h":13,"xAdv":10,"xOff":0,"yOff":-12},{"offset":228,"w":9,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":243,"w":8,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":256,"w":2,"h":10,"xAdv":5,"xOff":1,"yOff":-9},{"offset":259,"w":3,"h":12,"xAdv":5,"xOff":1,"yOff":-8},{"offset":264,"w":9,"h":9,"xAdv":11,"xOff":1,"yOff":-8},{"offset":275,"w":9,"h":4,"xAdv":11,"xOff":1,"yOff":-5},{"offset":280,"w":9,"h":9,"xAdv":11,"xOff":1,"yOff":-8},{"offset":291,"w":9,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":306,"w":17,"h":16,"xAdv":18,"xOff":1,"yOff":-12},{"offset":340,"w":12,"h":13,"xAdv":12,"xOff":0,"yOff":-12},{"offset":360,"w":11,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":378,"w":11,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":396,"w":11,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":414,"w":9,"h":13,"xAdv":11,"xOff":1,"yOff":-12},{"offset":429,"w":8,"h":13,"xAdv":11,"xOff":1,"yOff":-12},{"offset":442,"w":12,"h":13,"xAdv":14,"xOff":1,"yOff":-12},{"offset":462,"w":11,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":480,"w":2,"h":13,"xAdv":5,"xOff":2,"yOff":-12},{"offset":484,"w":7,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":496,"w":11,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":514,"w":8,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":527,"w":13,"h":13,"xAdv":15,"xOff":1,"yOff":-12},{"offset":549,"w":11,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":567,"w":13,"h":13,"xAdv":14,"xOff":1,"yOff":-12},{"offset":589,"w":10,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":606,"w":13,"h":14,"xAdv":14,"xOff":1,"yOff":-12},{"offset":629,"w":12,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":649,"w":10,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":666,"w":9,"h":13,"xAdv":11,"xOff":1,"yOff":-12},{"offset":681,"w":11,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":699,"w":11,"h":13,"xAdv":12,"xOff":0,"yOff":-12},{"offset":717,"w":17,"h":13,"xAdv":17,"xOff":0,"yOff":-12},{"offset":745,"w":12,"h":13,"xAdv":12,"xOff":0,"yOff":-12},{"offset":765,"w":12,"h":13,"xAdv":12,"xOff":0,"yOff":-12},{"offset":785,"w":10,"h":13,"xAdv":11,"xOff":1,"yOff":-12},{"offset":802,"w":3,"h":17,"xAdv":5,"xOff":1,"yOff":-12},{"offset":809,"w":5,"h":13,"xAdv":5,"xOff":0,"yOff":-12},{"offset":818,"w":3,"h":17,"xAdv":5,"xOff":0,"yOff":-12},{"offset":825,"w":7,"h":7,"xAdv":8,"xOff":1,"yOff":-12},{"offset":832,"w":10,"h":1,"xAdv":10,"xOff":0,"yOff":3},{"offset":834,"w":4,"h":3,"xAdv":5,"xOff":0,"yOff":-12},{"offset":836,"w":9,"h":10,"xAdv":10,"xOff":1,"yOff":-9},{"offset":848,"w":9,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":863,"w":8,"h":10,"xAdv":9,"xOff":1,"yOff":-9},{"offset":873,"w":8,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":886,"w":8,"h":10,"xAdv":10,"xOff":1,"yOff":-9},{"offset":896,"w":4,"h":13,"xAdv":5,"xOff":1,"yOff":-12},{"offset":903,"w":8,"h":14,"xAdv":10,"xOff":1,"yOff":-9},{"offset":917,"w":8,"h":13,"xAdv":10,"xOff":1,"yOff":-12},{"offset":930,"w":2,"h":13,"xAdv":4,"xOff":1,"yOff":-12},{"offset":934,"w":4,"h":17,"xAdv":4,"xOff":0,"yOff":-12},{"offset":943,"w":9,"h":13,"xAdv":9,"xOff":1,"yOff":-12},{"offset":958,"w":2,"h":13,"xAdv":4,"xOff":1,"yOff":-12},{"offset":962,"w":13,"h":10,"xAdv":15,"xOff":1,"yOff":-9},{"offset":979,"w":8,"h":10,"xAdv":10,"xOff":1,"yOff":-9},{"offset":989,"w":8,"h":10,"xAdv":10,"xOff":1,"yOff":-9},{"offset":999,"w":9,"h":13,"xAdv":10,"xOff":1,"yOff":-9},{"offset":1014,"w":8,"h":13,"xAdv":10,"xOff":1,"yOff":-9},{"offset":1027,"w":5,"h":10,"xAdv":6,"xOff":1,"yOff":-9},{"offset":1034,"w":8,"h":10,"xAdv":9,"xOff":1,"yOff":-9},{"offset":1044,"w":4,"h":12,"xAdv":5,"xOff":1,"yOff":-11},{"offset":1050,"w":8,"h":10,"xAdv":10,"xOff":1,"yOff":-9},{"offset":1060,"w":9,"h":10,"xAdv":9,"xOff":0,"yOff":-9},{"offset":1072,"w":13,"h":10,"xAdv":13,"xOff":0,"yOff":-9},{"offset":1089,"w":8,"h":10,"xAdv":9,"xOff":0,"yOff":-9},{"offset":1099,"w":9,"h":14,"xAdv":9,"xOff":0,"yOff":-9},{"offset":1115,"w":7,"h":10,"xAdv":9,"xOff":1,"yOff":-9},{"offset":1124,"w":4,"h":17,"xAdv":6,"xOff":1,"yOff":-12},{"offset":1133,"w":2,"h":17,"xAdv":4,"xOff":2,"yOff":-12},{"offset":1138,"w":4,"h":17,"xAdv":6,"xOff":1,"yOff":-12},{"offset":1147,"w":7,"h":3,"xAdv":9,"xOff":1,"yOff":-7}]},"medium":{"name":"FreeSans12pt7b","yAdvance":29,"bitmaps":[255,255,255,240,240,207,60,243,138,32,6,48,49,3,24,24,199,255,191,252,49,3,24,24,199,255,191,252,49,1,24,24,192,198,6,48,4,3,225,255,114,108,71,136,241,7,32,126,3,240,23,2,60,71,136,241,27,38,127,195,224,16,2,0,0,6,3,192,64,126,12,14,112,128,195,24,12,49,0,231,48,7,230,0,60,64,0,12,124,0,143,224,25,199,1,24,48,49,131,2,28,112,64,254,4,7,192,15,0,126,3,156,12,48,48,192,231,1,248,3,128,62,1,204,110,25,176,124,192,243,3,206,31,159,230,30,28,255,160,8,140,102,49,152,198,49,140,99,8,99,8,97,12,32,130,24,195,24,195,24,198,49,140,98,49,136,196,98,0,16,35,91,227,141,145,0,12,3,0,192,48,255,255,240,192,48,12,3,0,192,245,96,255,240,240,2,12,16,32,193,2,12,16,32,193,2,12,16,32,193,0,31,7,241,199,48,110,15,128,240,30,3,192,120,15,1,224,60,14,193,156,113,252,31,0,8,207,255,140,99,24,198,49,140,99,24,31,15,249,135,96,124,6,0,192,24,7,1,192,240,120,28,6,0,128,48,7,255,255,224,63,15,243,135,96,108,12,1,128,112,124,15,128,24,1,128,60,7,128,216,115,252,31,0,1,128,112,14,3,192,216,27,6,97,140,33,140,51,6,127,255,254,3,0,96,12,1,128,63,207,249,128,48,6,0,222,31,231,14,0,224,12,1,128,48,7,129,248,115,252,31,0,15,7,249,195,48,116,1,128,51,199,254,240,220,31,1,224,60,6,193,220,113,252,31,0,255,255,252,1,0,96,24,2,0,192,48,6,1,128,48,4,1,128,48,6,1,128,48,0,31,7,241,199,48,102,12,193,140,97,252,63,142,59,1,224,60,7,128,216,49,252,31,0,31,7,241,199,112,108,7,128,240,30,7,97,239,252,121,128,48,5,129,152,115,252,30,0,240,0,3,192,240,0,15,86,0,0,7,1,224,248,60,15,0,224,7,192,15,0,60,0,240,1,255,255,255,0,0,0,255,255,255,0,14,0,120,1,240,7,192,15,0,112,30,15,3,192,240,8,0,31,31,238,27,3,192,192,48,12,6,3,129,192,224,48,12,3,0,0,0,12,3,0,0,254,0,15,254,0,240,62,7,0,60,56,0,48,193,224,102,15,217,216,97,195,195,7,15,28,28,60,96,96,241,129,131,198,6,27,24,56,238,113,231,24,253,248,113,231,192,224,0,1,224,0,1,255,192,1,252,0,3,192,3,192,3,192,7,224,6,96,6,96,14,112,12,48,12,48,28,56,24,24,31,248,63,252,48,28,48,12,112,14,96,6,96,6,255,199,255,48,25,128,108,3,96,27,0,216,12,255,199,255,48,13,128,60,1,224,15,0,120,6,255,247,254,0,7,224,63,240,224,115,128,102,0,108,0,48,0,96,0,192,1,128,3,0,6,0,6,0,108,0,220,3,30,14,31,248,15,192,255,131,255,140,7,48,14,192,27,0,124,0,240,3,192,15,0,60,0,240,3,192,31,0,108,3,176,28,255,227,255,0,255,255,255,192,12,0,192,12,0,192,12,0,255,239,254,192,12,0,192,12,0,192,12,0,255,255,255,255,255,255,0,96,12,1,128,48,6,0,255,223,251,0,96,12,1,128,48,6,0,192,24,0,7,240,31,252,60,30,112,6,96,3,224,0,192,0,192,0,192,127,192,127,192,3,192,3,96,3,96,7,48,15,60,31,31,251,7,225,192,30,0,240,7,128,60,1,224,15,0,120,3,255,255,255,240,7,128,60,1,224,15,0,120,3,192,30,0,192,255,255,255,255,240,1,128,192,96,48,24,12,6,3,1,128,192,96,60,30,15,7,199,127,31,0,192,59,1,204,14,48,112,195,131,28,12,224,51,128,222,3,220,14,56,48,96,193,195,3,140,6,48,28,192,59,0,96,192,48,12,3,0,192,48,12,3,0,192,48,12,3,0,192,48,12,3,0,255,255,240,224,7,224,7,240,15,240,15,208,15,216,27,216,27,216,27,204,51,204,51,204,51,198,99,198,99,198,99,195,195,195,195,195,195,193,131,224,31,0,252,7,224,61,129,238,15,48,121,195,198,30,24,240,231,131,60,29,224,111,1,248,15,192,62,1,192,3,224,15,252,15,7,134,0,198,0,51,0,27,0,7,128,3,192,1,224,0,240,0,120,0,54,0,51,0,24,192,24,120,60,31,252,3,248,0,255,143,254,192,108,3,192,60,3,192,60,7,255,239,252,192,12,0,192,12,0,192,12,0,192,12,0,3,224,15,252,15,7,134,0,198,0,51,0,27,0,7,128,3,192,1,224,0,240,0,120,0,54,0,51,1,152,192,252,120,60,31,255,3,249,128,0,64,255,195,255,204,3,176,6,192,27,0,108,1,176,12,255,227,255,204,3,176,6,192,27,0,108,1,176,6,192,27,0,112,15,224,127,195,131,156,7,96,13,128,6,0,30,0,63,128,63,192,15,128,7,192,15,0,62,0,222,14,63,240,63,128,255,255,255,6,0,96,6,0,96,6,0,96,6,0,96,6,0,96,6,0,96,6,0,96,6,0,96,192,30,0,240,7,128,60,1,224,15,0,120,3,192,30,0,240,7,128,60,1,224,15,128,238,14,63,224,124,0,96,6,192,29,192,49,128,99,1,199,3,6,6,12,28,28,48,24,96,49,192,115,0,102,0,220,1,240,1,224,3,192,7,0,224,48,29,128,224,118,7,129,216,30,6,112,124,24,193,176,227,12,195,140,51,12,56,198,48,103,24,193,152,103,6,97,216,29,131,96,60,13,128,240,62,3,192,112,15,1,192,24,7,0,112,14,96,56,224,96,225,192,195,1,204,1,248,1,224,3,128,7,128,31,0,51,0,231,3,134,6,14,28,14,112,12,192,28,96,6,112,14,48,28,56,24,28,56,12,48,14,112,6,96,3,192,3,192,1,128,1,128,1,128,1,128,1,128,1,128,1,128,1,128,255,255,255,192,14,0,224,14,0,96,7,0,112,7,0,48,3,128,56,3,128,24,1,192,28,0,255,255,255,192,255,204,204,204,204,204,204,204,204,204,207,240,129,129,2,6,4,8,24,16,32,96,64,129,129,2,6,4,255,51,51,51,51,51,51,51,51,51,63,240,12,14,5,134,195,33,25,140,131,193,128,255,254,227,140,48,63,7,248,225,204,12,0,192,28,63,207,140,192,204,12,227,199,239,60,112,192,12,0,192,12,0,192,12,248,223,207,14,224,124,3,192,60,3,192,60,3,224,111,14,223,204,248,31,15,231,27,131,192,48,12,3,0,192,56,55,28,254,31,0,0,96,12,1,128,48,6,60,207,251,143,224,248,15,1,224,60,7,128,248,59,143,63,99,204,31,7,241,199,112,60,7,255,255,254,0,192,28,13,195,31,225,240,59,216,198,127,236,99,24,198,49,140,99,0,30,103,253,199,240,124,7,128,240,30,3,192,124,29,199,159,177,230,0,192,62,14,127,199,224,192,48,12,3,0,192,51,205,251,199,224,240,60,15,3,192,240,60,15,3,192,240,48,240,63,255,255,240,51,0,3,51,51,51,51,51,51,51,63,224,192,24,3,0,96,12,1,131,48,198,48,204,27,131,240,119,12,97,142,48,230,12,193,216,24,255,255,255,255,240,207,31,111,223,252,120,252,24,60,12,30,6,15,3,7,129,131,192,193,224,96,240,48,120,24,60,12,24,207,55,239,31,131,192,240,60,15,3,192,240,60,15,3,192,192,31,7,241,199,112,124,7,128,240,30,3,192,124,29,199,31,193,240,207,141,252,240,238,6,192,60,3,192,60,3,192,62,7,240,239,252,207,140,0,192,12,0,192,0,30,103,253,199,240,124,7,128,240,30,3,192,124,29,199,159,241,230,0,192,24,3,0,96,207,127,56,195,12,48,195,12,48,192,62,31,238,27,0,192,60,7,240,62,1,240,62,29,254,62,0,99,25,255,177,140,99,24,198,49,231,192,240,60,15,3,192,240,60,15,3,192,240,126,61,251,60,192,224,102,6,96,103,12,48,195,12,57,129,152,25,129,240,15,0,224,14,0,193,193,176,225,216,112,204,44,102,54,49,155,24,205,152,100,108,22,54,15,26,7,143,3,131,128,193,192,96,238,24,198,12,193,240,28,1,128,120,27,3,48,199,48,102,6,224,108,13,131,56,99,12,99,14,96,204,27,3,96,60,7,0,224,24,3,0,224,120,14,0,255,255,240,24,12,7,3,129,192,96,48,24,14,3,255,255,192,25,204,99,24,198,49,153,134,24,198,49,140,99,28,96,255,255,255,255,255,252,199,24,198,49,140,99,12,51,49,140,99,24,198,115,0,112,62,9,228,31,3,128],"glyphs":[{"offset":0,"w":0,"h":0,"xAdv":6,"xOff":0,"yOff":1},{"offset":0,"w":2,"h":18,"xAdv":8,"xOff":3,"yOff":-17},{"offset":5,"w":6,"h":6,"xAdv":8,"xOff":1,"yOff":-16},{"offset":10,"w":13,"h":16,"xAdv":13,"xOff":0,"yOff":-15},{"offset":36,"w":11,"h":20,"xAdv":13,"xOff":1,"yOff":-17},{"offset":64,"w":20,"h":17,"xAdv":21,"xOff":1,"yOff":-16},{"offset":107,"w":14,"h":17,"xAdv":16,"xOff":1,"yOff":-16},{"offset":137,"w":2,"h":6,"xAdv":5,"xOff":1,"yOff":-16},{"offset":139,"w":5,"h":23,"xAdv":8,"xOff":2,"yOff":-17},{"offset":154,"w":5,"h":23,"xAdv":8,"xOff":1,"yOff":-17},{"offset":169,"w":7,"h":7,"xAdv":9,"xOff":1,"yOff":-17},{"offset":176,"w":10,"h":11,"xAdv":14,"xOff":2,"yOff":-10},{"offset":190,"w":2,"h":6,"xAdv":7,"xOff":2,"yOff":-1},{"offset":192,"w":6,"h":2,"xAdv":8,"xOff":1,"yOff":-7},{"offset":194,"w":2,"h":2,"xAdv":6,"xOff":2,"yOff":-1},{"offset":195,"w":7,"h":18,"xAdv":7,"xOff":0,"yOff":-17},{"offset":211,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":235,"w":5,"h":17,"xAdv":13,"xOff":3,"yOff":-16},{"offset":246,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":270,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":294,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":318,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":342,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":366,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":390,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":414,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-16},{"offset":438,"w":2,"h":13,"xAdv":6,"xOff":2,"yOff":-12},{"offset":442,"w":2,"h":16,"xAdv":6,"xOff":2,"yOff":-11},{"offset":446,"w":12,"h":12,"xAdv":14,"xOff":1,"yOff":-11},{"offset":464,"w":12,"h":6,"xAdv":14,"xOff":1,"yOff":-8},{"offset":473,"w":12,"h":12,"xAdv":14,"xOff":1,"yOff":-11},{"offset":491,"w":10,"h":18,"xAdv":13,"xOff":2,"yOff":-17},{"offset":514,"w":22,"h":21,"xAdv":24,"xOff":1,"yOff":-17},{"offset":572,"w":16,"h":18,"xAdv":16,"xOff":0,"yOff":-17},{"offset":608,"w":13,"h":18,"xAdv":16,"xOff":2,"yOff":-17},{"offset":638,"w":15,"h":18,"xAdv":17,"xOff":1,"yOff":-17},{"offset":672,"w":14,"h":18,"xAdv":17,"xOff":2,"yOff":-17},{"offset":704,"w":12,"h":18,"xAdv":15,"xOff":2,"yOff":-17},{"offset":731,"w":11,"h":18,"xAdv":14,"xOff":2,"yOff":-17},{"offset":756,"w":16,"h":18,"xAdv":18,"xOff":1,"yOff":-17},{"offset":792,"w":13,"h":18,"xAdv":17,"xOff":2,"yOff":-17},{"offset":822,"w":2,"h":18,"xAdv":7,"xOff":2,"yOff":-17},{"offset":827,"w":9,"h":18,"xAdv":13,"xOff":1,"yOff":-17},{"offset":848,"w":14,"h":18,"xAdv":16,"xOff":2,"yOff":-17},{"offset":880,"w":10,"h":18,"xAdv":14,"xOff":2,"yOff":-17},{"offset":903,"w":16,"h":18,"xAdv":20,"xOff":2,"yOff":-17},{"offset":939,"w":13,"h":18,"xAdv":18,"xOff":2,"yOff":-17},{"offset":969,"w":17,"h":18,"xAdv":19,"xOff":1,"yOff":-17},{"offset":1008,"w":12,"h":18,"xAdv":16,"xOff":2,"yOff":-17},{"offset":1035,"w":17,"h":19,"xAdv":19,"xOff":1,"yOff":-17},{"offset":1076,"w":14,"h":18,"xAdv":17,"xOff":2,"yOff":-17},{"offset":1108,"w":14,"h":18,"xAdv":16,"xOff":1,"yOff":-17},{"offset":1140,"w":12,"h":18,"xAdv":15,"xOff":1,"yOff":-17},{"offset":1167,"w":13,"h":18,"xAdv":17,"xOff":2,"yOff":-17},{"offset":1197,"w":15,"h":18,"xAdv":15,"xOff":0,"yOff":-17},{"offset":1231,"w":22,"h":18,"xAdv":22,"xOff":0,"yOff":-17},{"offset":1281,"w":15,"h":18,"xAdv":16,"xOff":0,"yOff":-17},{"offset":1315,"w":16,"h":18,"xAdv":16,"xOff":0,"yOff":-17},{"offset":1351,"w":13,"h":18,"xAdv":15,"xOff":1,"yOff":-17},{"offset":1381,"w":4,"h":23,"xAdv":7,"xOff":2,"yOff":-17},{"offset":1393,"w":7,"h":18,"xAdv":7,"xOff":0,"yOff":-17},{"offset":1409,"w":4,"h":23,"xAdv":7,"xOff":1,"yOff":-17},{"offset":1421,"w":9,"h":9,"xAdv":11,"xOff":1,"yOff":-16},{"offset":1432,"w":15,"h":1,"xAdv":13,"xOff":-1,"yOff":4},{"offset":1434,"w":5,"h":4,"xAdv":6,"xOff":1,"yOff":-17},{"offset":1437,"w":12,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1457,"w":12,"h":18,"xAdv":13,"xOff":1,"yOff":-17},{"offset":1484,"w":10,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":1501,"w":11,"h":18,"xAdv":13,"xOff":1,"yOff":-17},{"offset":1526,"w":11,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1544,"w":5,"h":18,"xAdv":7,"xOff":1,"yOff":-17},{"offset":1556,"w":11,"h":18,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1581,"w":10,"h":18,"xAdv":13,"xOff":1,"yOff":-17},{"offset":1604,"w":2,"h":18,"xAdv":5,"xOff":2,"yOff":-17},{"offset":1609,"w":4,"h":23,"xAdv":6,"xOff":0,"yOff":-17},{"offset":1621,"w":11,"h":18,"xAdv":12,"xOff":1,"yOff":-17},{"offset":1646,"w":2,"h":18,"xAdv":5,"xOff":1,"yOff":-17},{"offset":1651,"w":17,"h":13,"xAdv":19,"xOff":1,"yOff":-12},{"offset":1679,"w":10,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1696,"w":11,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1714,"w":12,"h":17,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1740,"w":11,"h":17,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1764,"w":6,"h":13,"xAdv":8,"xOff":1,"yOff":-12},{"offset":1774,"w":10,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":1791,"w":5,"h":16,"xAdv":7,"xOff":1,"yOff":-15},{"offset":1801,"w":10,"h":13,"xAdv":13,"xOff":1,"yOff":-12},{"offset":1818,"w":12,"h":13,"xAdv":12,"xOff":0,"yOff":-12},{"offset":1838,"w":17,"h":13,"xAdv":17,"xOff":0,"yOff":-12},{"offset":1866,"w":11,"h":13,"xAdv":11,"xOff":0,"yOff":-12},{"offset":1884,"w":11,"h":18,"xAdv":11,"xOff":0,"yOff":-12},{"offset":1909,"w":10,"h":13,"xAdv":12,"xOff":1,"yOff":-12},{"offset":1926,"w":5,"h":23,"xAdv":8,"xOff":1,"yOff":-17},{"offset":1941,"w":2,"h":23,"xAdv":6,"xOff":2,"yOff":-17},{"offset":1947,"w":5,"h":23,"xAdv":8,"xOff":2,"yOff":-17},{"offset":1962,"w":10,"h":5,"xAdv":12,"xOff":1,"yOff":-10}]}};
+
+const W=400,H=300;
+
+function drawCharOn(tc,x,y,ch,fk,col){
+  const font=FONTS[fk];if(!font)return 0;
+  const code=ch.charCodeAt(0);if(code<0x20||code>0x7E)return font.glyphs[0]?.xAdv||0;
+  const gi=code-0x20,g=font.glyphs[gi];if(!g||g.w===0||g.h===0)return g?.xAdv||0;
+  const bm=font.bitmaps;let bi=g.offset*8;
+  for(let row=0;row<g.h;row++){for(let c2=0;c2<g.w;c2++){
+    const by=Math.floor(bi/8),bp=7-(bi%8),bit=(bm[by]>>bp)&1;
+    if(bit){const px=x+g.xOff+c2,py=y+g.yOff+row;
+      if(px>=0&&px<W&&py>=0&&py<H){tc.fillStyle=col||'#000';tc.fillRect(px,py,1,1);}}
+    bi++;
+  }}
+  tc.fillStyle='#000';return g.xAdv;
+}
+function drawStrOn(tc,x,y,str,fk,col){let cx=x;for(const ch of String(str))cx+=drawCharOn(tc,cx,y,ch,fk,col);return cx-x;}
+function strW(str,fk){const f=FONTS[fk];if(!f)return 0;return str.split('').reduce((w,ch)=>{const c=ch.charCodeAt(0);return c<32||c>126?w+(f.glyphs[0]?.xAdv||0):w+(f.glyphs[c-32]?.xAdv||0);},0);}
+
+// Draw scaled text using medium font scaled up (approximates FONT_LARGE and FONT_XLARGE)
+function drawStrScaled(tc,x,y,str,scale,col){
+  const fk='medium';
+  const f=FONTS[fk];if(!f)return;
+  const s=String(str);
+  let cx=x;
+  for(const ch of s){
+    const code=ch.charCodeAt(0);
+    if(code<0x20||code>0x7E){cx+=Math.round((f.glyphs[0]?.xAdv||0)*scale);continue;}
+    const gi=code-0x20,g=f.glyphs[gi];
+    if(!g||g.w===0||g.h===0){cx+=Math.round((g?.xAdv||0)*scale);continue;}
+    const bm=f.bitmaps;let bi=g.offset*8;
+    for(let row=0;row<g.h;row++){for(let c2=0;c2<g.w;c2++){
+      const by=Math.floor(bi/8),bp=7-(bi%8),bit=(bm[by]>>bp)&1;
+      if(bit){
+        const px=Math.round(cx+g.xOff*scale+c2*scale);
+        const py=Math.round(y+g.yOff*scale+row*scale);
+        const sw=Math.max(1,Math.round(scale));
+        tc.fillStyle=col||'#000';
+        tc.fillRect(px,py,sw,sw);
+      }
+      bi++;
+    }}
+    cx+=Math.round(g.xAdv*scale);
+  }
+}
+
+function makePage(id){
+  const cv=document.getElementById(id);
+  const c=cv.getContext('2d');
+  c.fillStyle='#fff';c.fillRect(0,0,W,H);
+  // helpers
+  const bdr=(x,y,w,h)=>{c.strokeStyle='#000';c.lineWidth=1;c.strokeRect(x+.5,y+.5,w,h);};
+  const bfc=(cx,cy,r,col)=>{c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fillStyle=col===0?'#fff':'#000';c.fill();c.fillStyle='#000';};
+  const bdc=(cx,cy,r,col)=>{c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.strokeStyle=col||'#000';c.lineWidth=1;c.stroke();};
+  const bfl=(x,y,w,h,col)=>{c.fillStyle=col===0?'#fff':'#000';c.fillRect(x,y,w,h);c.fillStyle='#000';};
+  const bdl=(x1,y1,x2,y2,dash,col)=>{c.beginPath();c.setLineDash(dash||[]);c.moveTo(x1+.5,y1+.5);c.lineTo(x2+.5,y2+.5);c.strokeStyle=col||'#000';c.lineWidth=1;c.stroke();c.setLineDash([]);};
+  const bS=(x,y,s,fk,col)=>drawStrOn(c,x,y,String(s),fk,col||'#000');
+  const bSL=(x,y,s,scale,col)=>drawStrScaled(c,x,y,String(s),scale,col||'#000');
+  return {c,bdr,bfc,bdc,bfl,bdl,bS,bSL};
+}
+
+function drawPageDots(c,pg){
+  const total=12,sp=15,r=4,sx=(W-(total*sp))/2+sp/2;
+  for(let i=0;i<total;i++){
+    const cx=sx+i*sp;
+    if(i===pg){c.beginPath();c.arc(cx,288,r,0,Math.PI*2);c.fillStyle='#000';c.fill();}
+    else{c.beginPath();c.arc(cx,288,r,0,Math.PI*2);c.strokeStyle='#000';c.lineWidth=1;c.stroke();
+          c.beginPath();c.arc(cx,288,r-1,0,Math.PI*2);c.stroke();}
+  }
+}
+
+function drawWiFiBars(c,x,y,bars){
+  for(let i=0;i<4;i++){
+    const h=(i+1)*4;
+    if(i<bars){c.fillStyle='#000';c.fillRect(x+i*6,y+16-h,4,h);}
+    else{c.strokeStyle='#000';c.lineWidth=1;c.strokeRect(x+i*6+.5,y+16-h+.5,3,h-1);}
+  }
+}
+
+function drawThermo(c,x,y){
+  c.beginPath();c.arc(x+3,y+18,4,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.arc(x+3,y+18,2,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.fillStyle='#000';c.fillRect(x+1,y,4,16);
+  c.fillStyle='#fff';c.fillRect(x+2,y,2,14);c.fillStyle='#000';
+}
+
+function drawDroplet(c,x,y){
+  c.beginPath();c.arc(x+4,y+10,4,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.moveTo(x+4,y);c.lineTo(x,y+8);c.lineTo(x+8,y+8);c.closePath();c.fill();
+  c.beginPath();c.arc(x+4,y+10,2,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.fillStyle='#000';
+}
+
+function drawMoonIcon(c,cx,cy,r,phase){
+  if(phase==='New Moon'){c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.strokeStyle='#000';c.lineWidth=1;c.stroke();return;}
+  if(phase==='Full Moon'){c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fillStyle='#000';c.fill();return;}
+  const waxing=(phase==='Waxing Crescent'||phase==='First Quarter'||phase==='Waxing Gibbous');
+  c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  let ox=0;
+  if(phase==='Waxing Crescent'||phase==='Waning Crescent') ox=r-2;
+  else if(phase==='First Quarter'||phase==='Last Quarter') ox=0;
+  else ox=-(r-2);
+  const darkX=waxing?cx-ox:cx+ox;
+  c.beginPath();c.arc(darkX,cy,r,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.strokeStyle='#000';c.lineWidth=1;c.stroke();
+}
+
+function drawTrendArrow(c,x,y,trend){
+  c.fillStyle='#000';
+  if(trend>0){c.beginPath();c.moveTo(x,y-8);c.lineTo(x-5,y);c.lineTo(x+5,y);c.closePath();c.fill();c.fillRect(x-2,y,4,5);}
+  else if(trend<0){c.beginPath();c.moveTo(x,y+8);c.lineTo(x-5,y);c.lineTo(x+5,y);c.closePath();c.fill();c.fillRect(x-2,y-5,4,5);}
+  else{c.fillRect(x-6,y-3,12,2);c.fillRect(x-6,y+1,12,2);}
+}
+
+// ─── Sample data ──────────────────────────────────────────────────────────
+const loc='Sydney';
+const indoorTemp=22.4,indoorHum=58,bat=3.92,rssi=-65;
+const wTemp=24.8,wFeel=25.3,wCond='Partly Cloudy';
+const wHigh=27.2,wLow=16.4,wUV=6.2,wWind=18.5,wDir='SSW';
+const wAQI='Good',wPM25=4.2,wRain=0.0,wHumidity=62;
+const moonPhase='Waxing Gibbous',moonIllum=78;
+const sunrise='06:12 AM',sunset='07:48 PM';
+const moonrise='12:34 PM',moonset='01:22 AM';
+const h24=14,minV=35,secV=22;
+const fc=[
+  {day:'10-07',high:27,low:16,cond:'Partly Cloudy',rain:0.1,chance:10},
+  {day:'10-08',high:23,low:15,cond:'Light Rain',rain:2.4,chance:70},
+  {day:'10-09',high:20,low:14,cond:'Overcast',rain:0.8,chance:40},
+];
+const hr={
+  time:['14:00','15:00','16:00','17:00','18:00','19:00'],
+  temp:[24.8,25.2,24.1,22.8,21.0,19.5],
+  rain:[10,15,20,30,25,20],
+  rainMM:[0,0,0.1,0.3,0.2,0.1],
+  uv:[5.1,4.2,2.8,1.0,0.2,0],
+  wind:[18,20,22,17,15,14]
+};
+const tempH=[21.2,21.4,21.6,21.8,22.0,22.2,22.3,22.1,22.0,21.9,21.8,22.0,22.1,22.3,22.4,22.6,22.5,22.4,22.3,22.4,22.5,22.4,22.4,22.4];
+const humH=[55,56,57,58,58,57,56,55,56,57,58,58,59,59,58,58,57,57,58,58,58,58,57,58];
+
+// ─── PAGE 0: DASHBOARD ────────────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfc,bfl,bS,bSL}=makePage('c0');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  c.strokeRect(8.5,8.5,384,38);
+  drawWiFiBars(c,15,18,3);
+  bS(48,33,rssi+' dBm','small');
+  bfl(130,12,2,30,1);
+  bS(150,35,'AEDT','medium');
+  bfl(240,12,2,30,1);
+  // Battery
+  c.strokeStyle='#000';c.lineWidth=1;c.strokeRect(310.5,18.5,60,20);
+  bfl(370,24,3,8,1);
+  for(let i=0;i<4;i++) bfl(312+i*11,20,10,16,1);
+  bS(250,33,'3.9V','medium');
+  // Temp box
+  c.strokeRect(12.5,55.5,185,78);c.strokeRect(13.5,56.5,183,76);
+  drawThermo(c,20,67);
+  bS(45,76,'TEMPERATURE','small');
+  bSL(30,122,indoorTemp.toFixed(1),2.2);
+  bS(155,122,'C','medium');
+  // Humidity box
+  c.strokeRect(203.5,55.5,185,78);c.strokeRect(204.5,56.5,183,76);
+  drawDroplet(c,211,67);
+  bS(237,76,'HUMIDITY','small');
+  bSL(222,122,Math.round(indoorHum),2.2);
+  bS(338,122,'%','medium');
+  bfl(8,145,384,3,1);
+  bS(15,172,'Tuesday 7/10/25','medium');
+  bS(255,172,loc,'medium');
+  // Clock (approximate with large canvas text)
+  c.font='bold 58px "Courier New",monospace';c.fillStyle='#000';c.fillText('14:35',18,268);
+  c.font='bold 26px "Courier New",monospace';c.fillText('22',323,230);
+  drawPageDots(c,0);
+})();
+
+// ─── PAGE 1: CURRENT CONDITIONS ───────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS,bSL}=makePage('c1');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,25,'CURRENT CONDITIONS  '+loc,'small');
+  bSL(12,80,wTemp.toFixed(1),2.2);bSL(120,80,'C',1.5);
+  bS(12,95,wCond,'small');
+  bS(12,123,'Feels like '+wFeel.toFixed(1)+' C','small');
+  bfl(200,34,2,102,1);bfl(302,34,2,102,1);
+  const bTop=34,slotH=52;
+  bS(208,bTop+16,'HIGH','small');bS(208,bTop+38,wHigh.toFixed(1)+' C','medium');
+  bS(208,bTop+slotH+16,'LOW','small');bS(208,bTop+slotH+38,wLow.toFixed(1)+' C','medium');
+  bS(310,bTop+16,'UV INDEX','small');bS(310,bTop+38,wUV.toFixed(1),'medium');
+  bS(310,bTop+slotH+16,'HUMIDITY','small');bS(310,bTop+slotH+38,wHumidity+' %','medium');
+  bfl(8,134,384,2,1);
+  let gy=152;
+  bS(12,gy,'WIND','small');bS(210,gy,'OUTDOOR TEMP','small');
+  bS(12,gy+20,wWind.toFixed(1)+' kph '+wDir,'medium');bS(210,gy+20,wTemp.toFixed(1)+' C','medium');
+  gy+=42;
+  bS(12,gy,'AIR QUALITY','small');bS(210,gy,'PM2.5','small');
+  bS(12,gy+20,wAQI,'medium');bS(210,gy+20,wPM25.toFixed(1)+' ug/m3','medium');
+  gy+=42;
+  bS(12,gy,'LAST UPDATED','small');bS(210,gy,'RAINFALL','small');
+  bS(12,gy+20,'2 min ago','medium');bS(210,gy+20,wRain.toFixed(1)+' mm','medium');
+  bfl(200,136,2,132,1);bfl(8,268,384,2,1);
+  drawPageDots(c,1);
+})();
+
+// ─── PAGE 2: HOURLY FORECAST ──────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS}=makePage('c2');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,24,'HOURLY FORECAST  '+loc,'small');
+  const cols=6,colW=62,colGap=2,startX=11;
+  const topY=36,hdrH=24,rowH=38;
+  const yTime=topY,yTemp=topY+hdrH,yRainPc=yTemp+rowH,yRainMM=yRainPc+rowH,yUV=yRainMM+rowH,yWind=yUV+rowH;
+  const totalH=hdrH+rowH*5;
+  for(let i=0;i<cols;i++){
+    const cx=startX+i*(colW+colGap);
+    c.strokeStyle='#000';c.lineWidth=1;c.strokeRect(cx+.5,topY+.5,colW,totalH);
+    c.fillStyle='#000';c.fillRect(cx+1,yTime+1,colW-2,hdrH-2);
+    bS(cx+5,yTime+17,hr.time[i],'small','#fff');
+    bS(cx+4,yTemp+13,'TEMP','small');bS(cx+4,yTemp+30,Math.round(hr.temp[i])+'c','small');
+    bS(cx+4,yRainPc+13,'RAIN','small');bS(cx+4,yRainPc+30,hr.rain[i]+'%','small');
+    bS(cx+4,yRainMM+13,'MM','small');bS(cx+4,yRainMM+30,hr.rainMM[i].toFixed(1),'small');
+    bS(cx+4,yUV+13,'UV','small');bS(cx+4,yUV+30,hr.uv[i].toFixed(1),'small');
+    bS(cx+4,yWind+13,'WIND','small');bS(cx+4,yWind+30,Math.round(hr.wind[i])+'k','small');
+  }
+  bS(12,285,'Upd 2m ago','small');
+  drawPageDots(c,2);
+})();
+
+// ─── PAGE 3: 3-DAY FORECAST ───────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS}=makePage('c3');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,25,'3-DAY FORECAST  '+loc,'small');
+  const cardW=122,cardY=36,hdrH=24,rowH=40,condH=52;
+  const cardH=hdrH+rowH+rowH+condH+rowH+rowH;
+  for(let i=0;i<3;i++){
+    const cx=10+i*(cardW+4);
+    c.strokeStyle='#000';c.lineWidth=1;c.strokeRect(cx+.5,cardY+.5,cardW,cardH);
+    c.fillStyle='#000';c.fillRect(cx+1,cardY+1,cardW-2,hdrH-1);
+    bS(cx+6,cardY+17,fc[i].day,'small','#fff');
+    let y=cardY+hdrH+2;
+    bS(cx+6,y+11,'HIGH','small');bS(cx+6,y+30,fc[i].high+' C','medium');
+    y+=rowH;
+    bS(cx+6,y+11,'LOW','small');bS(cx+6,y+30,fc[i].low+' C','medium');
+    y+=rowH;
+    bS(cx+6,y+11,'COND','small');bS(cx+6,y+28,fc[i].cond,'small');
+    y+=condH;
+    bS(cx+6,y+11,'RAIN','small');bS(cx+6,y+30,fc[i].rain.toFixed(1)+'mm','medium');
+    y+=rowH;
+    bS(cx+6,y+11,'CHANCE','small');bS(cx+6,y+30,fc[i].chance+' %','medium');
+  }
+  bS(12,285,'Updated 2m ago','small');
+  drawPageDots(c,3);
+})();
+
+// ─── PAGE 4: ASTRONOMY ────────────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS,bSL}=makePage('c4');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,24,'Tuesday 7/10/25  ASTRONOMY  '+loc,'small');
+  c.strokeRect(8.5,36.5,384,72);c.strokeRect(9.5,37.5,382,70);
+  const lx=20,rx=210;
+  bS(lx,56,'SUNRISE','small');bS(rx,56,'SUNSET','small');
+  bSL(lx,84,sunrise,1.5);bSL(rx,84,sunset,1.5);
+  bS(lx,100,'Day: 13h 36m','small');bS(rx,100,'Solar noon: 13:00','small');
+  c.strokeRect(8.5,112.5,384,154);c.strokeRect(9.5,113.5,382,152);
+  drawMoonIcon(c,340,189,28,moonPhase);
+  const slotH=50;
+  bS(lx,124,'MOONRISE','small');bS(rx,124,'MOONSET','small');
+  bS(lx,144,moonrise,'medium');bS(rx,144,moonset,'medium');
+  bS(lx,174,'PHASE','small');bS(rx,174,'ILLUM','small');
+  bS(lx,194,moonPhase,'medium');bS(rx,194,moonIllum+' %','medium');
+  bS(lx,224,'NEXT PHASE','small');bS(rx,224,'DAYS UNTIL','small');
+  bS(lx,244,'Full Moon','medium');bS(rx,244,'4 days','medium');
+  drawPageDots(c,4);
+})();
+
+// ─── PAGE 5: LUNAR ORBIT ──────────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS}=makePage('c5');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,24,'LUNAR ORBIT  '+loc,'small');
+  const ox=200,oy=158,orb=100;
+  const moonDeg=135,nextDeg=180;
+  // Progress arc
+  c.beginPath();
+  for(let a=0;a<=moonDeg;a++){
+    const r=a*Math.PI/180;
+    const x=ox+(orb-6)*Math.cos(r),y=oy+(orb-6)*Math.sin(r);
+    if(a===0)c.moveTo(x,y);else c.lineTo(x,y);
+  }
+  c.strokeStyle='#000';c.lineWidth=3;c.stroke();c.lineWidth=1;
+  // Orbit circle
+  c.beginPath();c.arc(ox,oy,orb,0,Math.PI*2);c.strokeStyle='#000';c.stroke();
+  // Earth
+  c.beginPath();c.arc(ox,oy,8,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.arc(ox,oy,4,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.fillStyle='#000';
+  bS(ox-4,oy+4,'E','small','#fff');
+  const markers=[
+    {a:0,l1:'New',l2:'Moon'},{a:45,l1:'Wax',l2:'Cresc'},{a:90,l1:'1st',l2:'Qtr'},
+    {a:135,l1:'Wax',l2:'Gibb'},{a:180,l1:'Full',l2:'Moon'},{a:225,l1:'Wan',l2:'Gibb'},
+    {a:270,l1:'Last',l2:'Qtr'},{a:315,l1:'Wan',l2:'Cresc'}
+  ];
+  markers.forEach(m=>{
+    const rad=m.a*Math.PI/180;
+    c.beginPath();c.moveTo(ox+(orb-5)*Math.cos(rad),oy+(orb-5)*Math.sin(rad));
+    c.lineTo(ox+(orb+5)*Math.cos(rad),oy+(orb+5)*Math.sin(rad));c.strokeStyle='#000';c.stroke();
+    let lx,ly;
+    if(m.a===270){lx=ox-17;ly=oy-orb+22;}
+    else if(m.a===90){lx=ox-8;ly=oy+orb-42;}
+    else{
+      const lr=orb+28;lx=ox+lr*Math.cos(rad);ly=oy+lr*Math.sin(rad);
+      const isLeft=m.a>90&&m.a<270,isTop=m.a>180&&m.a<360;
+      if(isLeft)lx-=38;else lx-=8;if(isTop)ly-=18;else ly-=2;
+    }
+    bS(lx,ly,m.l1,'small');bS(lx,ly+16,m.l2,'small');
+    if(m.a===nextDeg%360) bS(lx,ly+32,'in 4d','small');
+  });
+  // Moon icon
+  const mrad=moonDeg*Math.PI/180;
+  const mx=ox+orb*Math.cos(mrad),my=oy+orb*Math.sin(mrad);
+  drawMoonIcon(c,mx,my,9,moonPhase);
+  // Illum %
+  const midRad=(moonDeg+nextDeg)/2*Math.PI/180;
+  const ilr=orb+28,ilx=ox+ilr*Math.cos(midRad)-6,ily=oy+ilr*Math.sin(midRad)+4;
+  bS(ilx,ily,moonIllum+'%','small');
+  // Age label
+  const perpRad=mrad+Math.PI/2;
+  const agx=Math.round(ox+(orb*0.72)*Math.cos(mrad)+(10*Math.cos(perpRad)))-8;
+  const agy=Math.round(oy+(orb*0.72)*Math.sin(mrad)+(10*Math.sin(perpRad)))+4;
+  bS(agx,agy,'Age 11d','small');
+  drawPageDots(c,5);
+})();
+
+// ─── PAGE 6: SUN ARC ──────────────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS}=makePage('c6');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,25,'SUN POSITION  '+loc,'small');
+  const cx2=200,cy2=200,r=145,arcM=28;
+  // Horizon line
+  c.beginPath();c.moveTo(arcM+.5,cy2+.5);c.lineTo(W-arcM+.5,cy2+.5);c.strokeStyle='#000';c.stroke();
+  // Arc
+  c.beginPath();c.arc(cx2,cy2,r,Math.PI,0);c.strokeStyle='#000';c.stroke();
+  // Noon dashes
+  for(let y=cy2-r;y<cy2;y+=5){c.fillStyle='#000';c.fillRect(cx2,y,1,3);}
+  bS(cx2-18,cy2-r-6,'NOON','small');
+  bS(arcM+2,cy2+20,sunrise,'small');bS(W-arcM-52,cy2+20,sunset,'small');
+  // Sun position
+  const srM=6*60+12,ssM=19*60+48,nowM=h24*60+minV;
+  const sunDeg=(nowM-srM)/(ssM-srM)*180;
+  const sunRad=sunDeg*Math.PI/180;
+  const sunX=cx2-r*Math.cos(sunRad),sunY=cy2-r*Math.sin(sunRad);
+  c.beginPath();c.arc(sunX,sunY,9,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.arc(sunX,sunY,5,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.fillStyle='#000';
+  for(let i=0;i<8;i++){const a=i*Math.PI/4;c.beginPath();c.moveTo(sunX+11*Math.cos(a),sunY+11*Math.sin(a));c.lineTo(sunX+15*Math.cos(a),sunY+15*Math.sin(a));c.strokeStyle='#000';c.stroke();}
+  bfl(8,230,384,2,1);
+  bS(14,250,'DAY LENGTH','small');bS(148,250,'SOLAR NOON','small');bS(282,250,'SUNSET IN','small');
+  bS(14,270,'13h 36m','medium');bS(148,270,'13:00','medium');bS(282,270,'5h 13m','medium');
+  bfl(140,230,1,42,1);bfl(274,230,1,42,1);
+  drawPageDots(c,6);
+})();
+
+// ─── PAGE 7: SEASONS CLASSIC ──────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfc,bfl,bS}=makePage('c7');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,24,'EARTH & SEASONS  '+loc,'small');
+  const ox=200,oy=158,orx=130,ory=100;
+  for(let deg=0;deg<360;deg++){
+    const rad=deg*Math.PI/180;
+    c.fillStyle='#000';c.fillRect(ox+Math.round(orx*Math.cos(rad)),oy+Math.round(ory*Math.sin(rad)),1,1);
+  }
+  // Sun
+  c.beginPath();c.arc(ox,oy,7,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.arc(ox,oy,3,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.fillStyle='#000';
+  for(let i=0;i<8;i++){const a=i*Math.PI/4;c.beginPath();c.moveTo(ox+9*Math.cos(a),oy+9*Math.sin(a));c.lineTo(ox+13*Math.cos(a),oy+13*Math.sin(a));c.strokeStyle='#000';c.stroke();}
+  bS(ox-4,oy+4,'S','small','#fff');
+  // SOL/EQ markers
+  [[0,'EQU','20 Mar'],[270,'SOL','21 Jun'],[180,'EQU','22 Sep'],[90,'SOL','21 Dec']].forEach(([ang,lbl,dt])=>{
+    const rad=ang*Math.PI/180;
+    const mx=ox+orx*Math.cos(rad),my=oy+ory*Math.sin(rad);
+    c.beginPath();c.arc(mx,my,4,0,Math.PI*2);c.fillStyle='#000';c.fill();
+    let tx,ty;
+    if(ang===0){tx=mx+10;ty=my-25;}
+    else if(ang===180){tx=mx-68;ty=my-25;}
+    else if(ang===270){tx=mx-16;ty=my+22;}
+    else{tx=mx-16;ty=my-26;}
+    bS(tx,ty,lbl,'small');bS(tx,ty+14,dt,'small');
+  });
+  // Corner season names
+  bS(14,52,'WINTER','small');bS(316,52,'AUTUMN','small');
+  bS(14,272,'SPRING','small');bS(316,272,'SUMMER','small');
+  // Earth (spring ~315 deg)
+  const earthDeg=315;
+  const erad=earthDeg*Math.PI/180;
+  const ex=ox+orx*Math.cos(erad),ey=oy+ory*Math.sin(erad);
+  c.beginPath();c.arc(ex,ey,6,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.arc(ex,ey,3,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.fillStyle='#000';
+  bS(ex+9,ey-6,'NOW','small');bS(ex+9,ey+6,'75d','small');
+  drawPageDots(c,7);
+})();
+
+// ─── PAGE 8: SEASONS ORBIT (FILLED) ──────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS}=makePage('c8');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,24,'EARTH & SEASONS '+loc,'small');
+  const nextEvt='SOL 21 Dec';
+  const nw=strW(nextEvt,'small');bS(388-nw,24,nextEvt,'small');
+  // Corner countdowns
+  bS(12,52,'75d','small');   // TL SEP EQU
+  const soonLbl='11d';const sw=strW(soonLbl,'small');
+  bS(390-sw-4,52,soonLbl,'small');c.strokeRect(390-sw-8,36,sw+8,23); // boxed = soonest
+  bS(12,261,'158d','small'); // BL DEC SOL
+  const m4='158d';bS(390-strW(m4,'small')-4,261,m4,'small');
+  const ocx=200,ocy=158,orx=130,ory=100;
+  // Fill ellipse black
+  for(let fy=ocy-ory;fy<=ocy+ory;fy++){
+    const fdy=fy-ocy,disc=1-(fdy*fdy)/(ory*ory);
+    if(disc<0)continue;
+    const fex=Math.floor(orx*Math.sqrt(disc));
+    c.fillStyle='#000';c.fillRect(ocx-fex,fy,fex*2+1,1);
+  }
+  // White dashed crosshairs
+  for(let fx=ocx-orx+2;fx<ocx+orx-2;fx+=9)for(let k=0;k<5&&fx+k<ocx+orx-2;k++){c.fillStyle='#fff';c.fillRect(fx+k,ocy,1,1);}
+  for(let fy=ocy-ory+2;fy<ocy+ory-2;fy+=9)for(let k=0;k<5&&fy+k<ocy+ory-2;k++){c.fillStyle='#fff';c.fillRect(ocx,fy+k,1,1);}
+  // Ellipse outline
+  for(let deg=0;deg<360;deg++){const rd=deg*Math.PI/180;c.fillStyle='#fff';c.fillRect(ocx+Math.round(orx*Math.cos(rd)),ocy+Math.round(ory*Math.sin(rd)),1,1);}
+  for(let deg=0;deg<360;deg++){const rd=deg*Math.PI/180;c.fillStyle='#000';c.fillRect(ocx+Math.round(orx*Math.cos(rd)),ocy+Math.round(ory*Math.sin(rd)),1,1);}
+  c.fillStyle='#000';
+  // Sun
+  c.beginPath();c.arc(ocx,ocy,16,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.beginPath();c.arc(ocx,ocy,9,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.arc(ocx,ocy,5,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.fillStyle='#000';
+  for(let i=0;i<8;i++){const ra=i*Math.PI/4;c.beginPath();c.moveTo(ocx+11*Math.cos(ra),ocy+11*Math.sin(ra));c.lineTo(ocx+15*Math.cos(ra),ocy+15*Math.sin(ra));c.strokeStyle='#000';c.stroke();}
+  bS(ocx-4,ocy+4,'S','small','#fff');
+  // Season names white
+  [['SUMMER',45],['SPRING',135],['WINTER',225],['AUTUMN',315]].forEach(([n,a])=>{
+    const rd=a*Math.PI/180,snx=ocx+orx*0.56*Math.cos(rd),sny=ocy+ory*0.56*Math.sin(rd);
+    bS(snx-strW(n,'small')/2,sny+4,n,'small','#fff');
+  });
+  // Month ticks + labels
+  const months=['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+  months.forEach((mon,i)=>{
+    const mrad=-i*30*Math.PI/180;
+    c.beginPath();c.moveTo(ocx+orx*Math.cos(mrad),ocy+ory*Math.sin(mrad));
+    c.lineTo(ocx+(orx+9)*Math.cos(mrad),ocy+(ory+9)*Math.sin(mrad));c.strokeStyle='#000';c.stroke();
+    const mlr=(i===0||i===6)?orx+30:orx+20,mlry=(i===0||i===6)?ory+30:ory+20;
+    bS(ocx+mlr*Math.cos(mrad)-strW(mon,'small')/2,ocy+mlry*Math.sin(mrad)+4,mon,'small');
+  });
+  // Bullseye markers
+  [0,90,180,270].forEach(ang=>{
+    const rd=ang*Math.PI/180,bpx=ocx+orx*Math.cos(rd),bpy=ocy+ory*Math.sin(rd);
+    c.beginPath();c.arc(bpx,bpy,8,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+    c.beginPath();c.arc(bpx,bpy,6,0,Math.PI*2);c.strokeStyle='#000';c.lineWidth=2;c.stroke();c.lineWidth=1;
+    c.beginPath();c.arc(bpx,bpy,4,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+    c.beginPath();c.arc(bpx,bpy,2,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  });
+  // Earth dot (spring ~315deg)
+  const erd=315*Math.PI/180,epx=ocx+orx*Math.cos(erd),epy=ocy+ory*Math.sin(erd);
+  c.beginPath();c.arc(epx,epy,8,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.beginPath();c.arc(epx,epy,8,0,Math.PI*2);c.strokeStyle='#000';c.lineWidth=1;c.stroke();
+  c.beginPath();c.arc(epx,epy,5,0,Math.PI*2);c.fillStyle='#000';c.fill();
+  c.beginPath();c.arc(epx,epy,3,0,Math.PI*2);c.fillStyle='#fff';c.fill();c.fillStyle='#000';
+  drawPageDots(c,8);
+})();
+
+// ─── SHARED: graph helper ─────────────────────────────────────────────────
+function drawGraph(c,data,gX,gY,gW,gH,unit){
+  const mn=Math.min(...data),mx=Math.max(...data);
+  const bMn=mn-1,bMx=mx+1,bRng=Math.max(bMx-bMn,1);
+  c.strokeStyle='#000';c.lineWidth=1;c.strokeRect(gX-1,gY-1,gW+2,gH+2);
+  for(let i=1;i<=3;i++){c.beginPath();c.moveTo(gX,gY+i*gH/4);c.lineTo(gX+gW,gY+i*gH/4);c.stroke();}
+  for(let i=0;i<=4;i++){c.beginPath();c.moveTo(gX+i*gW/4,gY);c.lineTo(gX+i*gW/4,gY+gH);c.stroke();}
+  // Find min/max indices
+  let minIdx=0,maxIdx=0;data.forEach((v,i)=>{if(v<data[minIdx])minIdx=i;if(v>data[maxIdx])maxIdx=i;});
+  // Line
+  c.beginPath();
+  data.forEach((v,i)=>{
+    const x=gX+i*gW/(data.length-1),y=gY+gH-(v-bMn)/bRng*gH;
+    if(i===0)c.moveTo(x,y);else c.lineTo(x,y);
+  });
+  c.strokeStyle='#000';c.lineWidth=2;c.stroke();c.lineWidth=1;
+  // Min/max markers
+  const minX=gX+minIdx*gW/(data.length-1),minY=gY+gH-(data[minIdx]-bMn)/bRng*gH;
+  c.fillStyle='#000';c.beginPath();c.moveTo(minX,minY+2);c.lineTo(minX-4,minY-5);c.lineTo(minX+4,minY-5);c.closePath();c.fill();
+  drawStrOn(c,Math.max(gX,minX-8),minY+14,data[minIdx].toFixed(1),'small');
+  const maxX=gX+maxIdx*gW/(data.length-1),maxY=gY+gH-(data[maxIdx]-bMn)/bRng*gH;
+  c.beginPath();c.moveTo(maxX,maxY-2);c.lineTo(maxX-4,maxY+5);c.lineTo(maxX+4,maxY+5);c.closePath();c.fill();
+  drawStrOn(c,Math.max(gX,maxX-8),maxY-5,data[maxIdx].toFixed(1),'small');
+  // Y labels
+  drawStrOn(c,gX-38,gY+5,bMx.toFixed(0)+unit,'small');
+  drawStrOn(c,gX-38,gY+gH/2+4,((bMx+bMn)/2).toFixed(0)+unit,'small');
+  drawStrOn(c,gX-38,gY+gH-2,bMn.toFixed(0)+unit,'small');
+  const xl=['6h','4.5h','3h','1.5h','0h'];
+  for(let i=0;i<=4;i++) drawStrOn(c,gX+i*gW/4-(i===4?12:6),gY+gH+14,xl[i],'small');
+}
+
+// ─── PAGE 9: TEMP GRAPH ───────────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS,bSL}=makePage('c9');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  drawThermo(c,16,14);
+  bS(38,22,'INDOOR TEMP','small');bS(38,38,'6 HOUR HISTORY','small');
+  bSL(220,38,indoorTemp.toFixed(1),1.5);bS(291,38,'C','small');
+  drawTrendArrow(c,375,22,1);
+  drawGraph(c,tempH,44,52,336,168,'c');
+  c.strokeStyle='#000';c.strokeRect(8.5,244.5,384,24);
+  bS(8,261,'0h:','small');bS(39,261,indoorTemp.toFixed(1)+'c','small');
+  bS(90,261,'MIN:','small');bS(134,261,'21.2c','small');
+  bS(200,261,'MAX:','small');bS(250,261,'22.6c','small');
+  bS(308,261,'RISING','small');
+  drawPageDots(c,9);
+})();
+
+// ─── PAGE 10: HUMIDITY GRAPH ──────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS,bSL}=makePage('c10');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  drawDroplet(c,16,14);
+  bS(38,22,'INDOOR HUMIDITY','small');bS(38,38,'6 HOUR HISTORY','small');
+  bSL(220,38,Math.round(indoorHum),1.5);bS(261,38,'%','small');
+  drawTrendArrow(c,375,22,0);
+  drawGraph(c,humH,44,52,336,168,'%');
+  c.strokeStyle='#000';c.strokeRect(8.5,244.5,384,24);
+  bS(8,261,'0h:','small');bS(39,261,Math.round(indoorHum)+'%','small');
+  bS(90,261,'MIN:','small');bS(134,261,'55.0%','small');
+  bS(200,261,'MAX:','small');bS(250,261,'59.0%','small');
+  bS(308,261,'STABLE','small');
+  drawPageDots(c,10);
+})();
+
+// ─── PAGE 11: SYSTEM INFO ─────────────────────────────────────────────────
+(function(){
+  const {c,bdr,bfl,bS}=makePage('c11');
+  bdr(0,0,399,299);bdr(1,1,397,297);
+  bS(12,24,'SYSTEM INFO','small');
+  const lx=14,rx=204,rowH=44,gy0=36;
+  c.fillStyle='#000';c.fillRect(198,gy0,2,rowH*5);
+  const rows=[
+    ['WIFI',rssi+' dBm','IP ADDRESS','192.168.1.105'],
+    ['WEATHER','Fresh','WX REFRESH','28m 14s'],
+    ['UPTIME','02:14:33','NTP SYNC','14 min ago'],
+    ['NETWORK','HomeNetwork','CHANNEL','6'],
+    ['SENSOR','OK','SENSOR READS','142/145 ok'],
+  ];
+  rows.forEach(([ll,lv,rl,rv],i)=>{
+    const gy=gy0+i*rowH;
+    bS(lx,gy+12,ll,'small');bS(lx,gy+32,lv,'medium');
+    bS(rx,gy+12,rl,'small');bS(rx,gy+32,rv,'medium');
+  });
+  c.fillStyle='#000';c.fillRect(8,264,384,2);
+  drawPageDots(c,11);
+})();
+
+</script>
+</body>
+</html>
