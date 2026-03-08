@@ -47,6 +47,7 @@ A data-rich, 12-page time and weather dashboard built on an **ESP32-S3** microco
 | Battery ADC | GPIO 4 |
 
 This project was developed on the **Waveshare ESP32-S3 RLCD 4.2"** development board. Refer to the Waveshare documentation for pinout and wiring details.
+https://docs.waveshare.com/ESP32-S3-RLCD-4.2
 
 ---
 
