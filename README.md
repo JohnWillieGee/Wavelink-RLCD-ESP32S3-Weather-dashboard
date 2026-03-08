@@ -15,6 +15,8 @@ A data-rich, 12-page time and weather dashboard built on an **ESP32-S3** microco
 - **Pixel-accurate browser preview** (`preview.html`) for layout verification before flashing — no guesswork
 
 https://youtu.be/wd1mQkY0oWk
+
+
 ---
 
 ## 📟 Display Pages
