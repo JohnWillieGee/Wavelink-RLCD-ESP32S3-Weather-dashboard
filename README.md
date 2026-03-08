@@ -1,4 +1,4 @@
-# Wavelink RLCD ESP32-S3 Weather Dashboard
+# Waveshare RLCD ESP32-S3 Weather Dashboard
 
 A data-rich, 12-page time and weather dashboard built on an **ESP32-S3** microcontroller, driving a **400×300 monochrome reflective LCD (RLCD)**. Combines live weather API data, on-board environmental sensing, RTC timekeeping, and original astronomical diagram designs — all rendered in crisp 1-bit monochrome.
 
